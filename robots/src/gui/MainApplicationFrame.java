@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import language.LanguageAdapter;
 import log.Logger;
 
 /**
@@ -26,7 +27,7 @@ import log.Logger;
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
 
-    public MainApplicationFrame() {
+    public MainApplicationFrame(LanguageAdapter adapter) {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
         int inset = 50;
@@ -37,36 +38,37 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
+//одна строчка
+        addWindow(createLogWindow(adapter));
+        addWindow(new GameWindow(adapter), 400, 400);
 
-        LogWindow logWindow = createLogWindow();
-        addWindow(logWindow);
-
-        GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400, 400);
-        addWindow(gameWindow);
-
-        setJMenuBar(generateMenuBar());
+        setJMenuBar(generateMenuBar(adapter));
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                handlingCloseEvent();
+                handlingCloseEvent(adapter);
             }
         });
     }
 
-    protected LogWindow createLogWindow() {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
+    protected LogWindow createLogWindow(LanguageAdapter adapter) {
+        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), adapter);
         logWindow.setLocation(10, 10);
         logWindow.setSize(300, 800);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
-        Logger.debug("Протокол работает");
+        Logger.debug(adapter.translate("protocol_is_working"));
         return logWindow;
     }
 
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
+    }
+
+    protected void addWindow(JInternalFrame frame, int width, int height) {
+        frame.setSize(width, height);
+        addWindow(frame);
     }
 
 //    protected JMenuBar createMenuBar() {
@@ -98,39 +100,48 @@ public class MainApplicationFrame extends JFrame {
 //        return menuBar;
 //    }
 
-    private JMenuBar generateMenuBar() {
+    private JMenuBar generateMenuBar(LanguageAdapter adapter) {
         JMenuBar menuBar = new JMenuBar();
         MenuModificator modificator = new MenuModificator();
-
-        JMenu lookAndFeelMenu = modificator.addMenu("Режим отображения",
-                "Управление режимом отображения приложения", KeyEvent.VK_V);
-        lookAndFeelMenu.add(modificator.addMenuButton("Системная схема", KeyEvent.VK_S, (event) -> {
-            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            this.invalidate();
-        }));
-        lookAndFeelMenu.add(modificator.addMenuButton("Универсальная схема", KeyEvent.VK_S, (event) -> {
-            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            this.invalidate();
-        }));
-
-        JMenu testMenu = modificator.addMenu("Тесты", "Тестовые команды", KeyEvent.VK_T);
-        testMenu.add(modificator.addMenuButton("Сообщение в лог", KeyEvent.VK_S, (event) -> {
-            Logger.debug("Новая строка");
-        }));
-
-        JMenu additionalMenu = modificator.addMenu("Дополнительно",
-                "Дополнительные возможности", KeyEvent.VK_A);
-        additionalMenu.add(modificator.addMenuButton("Выход", KeyEvent.VK_Q, (event) -> handlingCloseEvent()));
-
-        menuBar.add(lookAndFeelMenu);
-        menuBar.add(testMenu);
-        menuBar.add(additionalMenu);
+//разбить на методы
+        menuBar.add(createLookAndFeelMenu(modificator, adapter));
+        menuBar.add(createTestMenu(modificator, adapter));
+        menuBar.add(createAdditionalMenu(modificator, adapter));
         return menuBar;
     }
 
-    private void handlingCloseEvent() {
-        String[] options = {"Да", "Нет"};
-        int exit = JOptionPane.showOptionDialog(null, "Вы уверены?", "Выход",
+    private JMenu createLookAndFeelMenu(MenuModificator modificator, LanguageAdapter adapter) {
+        JMenu lookAndFeelMenu = modificator.addMenu(adapter.translate("display_mode"),
+                adapter.translate("display_mode_descr"), KeyEvent.VK_V);
+        lookAndFeelMenu.add(modificator.addMenuButton(adapter.translate("system_scheme"), KeyEvent.VK_S, (event) -> {
+            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            this.invalidate();
+        }));
+        lookAndFeelMenu.add(modificator.addMenuButton(adapter.translate("uni_scheme"), KeyEvent.VK_S, (event) -> {
+            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            this.invalidate();
+        }));
+        return lookAndFeelMenu;
+    }
+
+    private JMenu createTestMenu(MenuModificator modificator, LanguageAdapter adapter) {
+        JMenu testMenu = modificator.addMenu(adapter.translate("tests"), adapter.translate("tests_command"), KeyEvent.VK_T);
+        testMenu.add(modificator.addMenuButton(adapter.translate("log_message"), KeyEvent.VK_S, (event) -> {
+            Logger.debug(adapter.translate("new_str"));
+        }));
+        return testMenu;
+    }
+
+    private JMenu createAdditionalMenu(MenuModificator modificator, LanguageAdapter adapter) {
+        JMenu additionalMenu = modificator.addMenu(adapter.translate("additional"),
+                adapter.translate("additional_descr"), KeyEvent.VK_A);
+        additionalMenu.add(modificator.addMenuButton(adapter.translate("exit"), KeyEvent.VK_ESCAPE, (event) -> handlingCloseEvent(adapter)));
+        return additionalMenu;
+    }
+
+    private void handlingCloseEvent(LanguageAdapter adapter) {
+        String[] options = {adapter.translate("option_yes"), adapter.translate("option_no")};
+        int exit = JOptionPane.showOptionDialog(null, adapter.translate("confirm"), adapter.translate("exit"),
                 JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, options, options[1]);
         if (exit == 0)
