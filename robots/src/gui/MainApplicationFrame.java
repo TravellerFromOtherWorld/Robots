@@ -18,6 +18,7 @@ import java.awt.event.WindowEvent;
 
 import language.LanguageAdapter;
 import log.Logger;
+import gui.saveAndRestore.SaveAndRestore;
 
 /**
  * Что требуется сделать:
@@ -26,6 +27,7 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final SaveAndRestore saveAndRestore = new SaveAndRestore();
 
     public MainApplicationFrame(LanguageAdapter adapter) {
         //Make the big window be indented 50 pixels from each edge
@@ -39,8 +41,7 @@ public class MainApplicationFrame extends JFrame {
         setContentPane(desktopPane);
 
 //одна строчка
-        addWindow(createLogWindow(adapter));
-        addWindow(new GameWindow(adapter), 400, 400);
+        restoreUserState(adapter);
 
         setJMenuBar(generateMenuBar(adapter));
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -144,8 +145,32 @@ public class MainApplicationFrame extends JFrame {
         int exit = JOptionPane.showOptionDialog(null, adapter.translate("confirm"), adapter.translate("exit"),
                 JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, options, options[1]);
-        if (exit == 0)
-            System.exit(0);
+        if (exit == 0) {
+            int exitCode = 0;
+            if (!saveAndRestore.saveUserState(desktopPane))
+                exitCode = 1;
+            System.exit(exitCode);
+        }
+    }
+
+    private void restoreUserState(LanguageAdapter adapter) {
+        if (!saveAndRestore.userFileDontExist()) {
+            try {
+                JInternalFrame[] frames = saveAndRestore.restoreUserState(adapter);
+                for (JInternalFrame frame : frames) {
+                    addWindow(frame);
+                }
+            } catch (Exception ex) {
+                createStandardState(adapter);
+            }
+        } else {
+            createStandardState(adapter);
+        }
+    }
+
+    private void createStandardState(LanguageAdapter adapter){
+        addWindow(createLogWindow(adapter));
+        addWindow(new GameWindow(adapter), 400, 400);
     }
 
     private void setLookAndFeel(String className) {
