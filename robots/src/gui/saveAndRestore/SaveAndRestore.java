@@ -35,6 +35,7 @@ public class SaveAndRestore {
     }
 
     public boolean saveUserState(JDesktopPane desktopPane) {
+        //сохраняет данные об окошках пользователя в файл "config.txt"
         if (userFileDontExist())
             if (!createUserDirectory())
                 return false;
@@ -53,6 +54,7 @@ public class SaveAndRestore {
     }
 
     public JInternalFrame[] restoreUserState(LanguageAdapter adapter) throws Exception {
+        //из файла "config.txt" считывает данные про окна и создаёт список окошек по заданным данным
         List<String> frames = Files.readAllLines(userFile);
         JInternalFrame[] userFrames = new JInternalFrame[frames.size()];
         for (int i = 0; i < frames.size(); i++) {
