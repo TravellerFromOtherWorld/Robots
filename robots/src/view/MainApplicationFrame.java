@@ -1,4 +1,4 @@
-package gui;
+package view;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -19,8 +19,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import language.LanguageAdapter;
-import log.Logger;
-import gui.saveAndRestore.SaveAndRestore;
+import model.log.Logger;
+import view.saveAndRestore.SaveAndRestore;
+import model.robotState.RobotState;
 
 /**
  * Что требуется сделать:
@@ -31,10 +32,12 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final LanguageAdapter adapter = new LanguageAdapter("rus");
     private final SaveAndRestore saveAndRestore = new SaveAndRestore();
+    private final RobotState robotModel;
 
-    public MainApplicationFrame() {
+    public MainApplicationFrame(RobotState model) {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
+        robotModel = model;
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
@@ -157,7 +160,7 @@ public class MainApplicationFrame extends JFrame {
 
     private void restoreUserState() {
         try {
-            JInternalFrame[] frames = saveAndRestore.restoreUserState(adapter);
+            JInternalFrame[] frames = saveAndRestore.restoreUserState(adapter, robotModel);
             for (JInternalFrame frame : frames) {
                 addWindow(frame);
             }
@@ -168,7 +171,8 @@ public class MainApplicationFrame extends JFrame {
 
     private void createStandardState() {
         addWindow(createLogWindow());
-        addWindow(new GameWindow(adapter), 400, 400);
+        addWindow(new GameWindow(adapter, robotModel), 400, 400);
+        addWindow(new RobotCoordinates(robotModel));
     }
 
     private JMenu addMenu(String menuName, String description, int mnemonic) {

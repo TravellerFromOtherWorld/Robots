@@ -1,4 +1,4 @@
-package log;
+package model.log;
 
 public interface LogChangeListener
 {

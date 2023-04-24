@@ -1,6 +1,4 @@
-package gui;
-
-import model.robot.RobotState;
+import model.robotState.RobotState;
 import view.MainApplicationFrame;
 
 import java.awt.Frame;
