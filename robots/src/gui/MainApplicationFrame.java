@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import gui.saveAndRestore.UserState;
 import language.LanguageAdapter;
 import log.Logger;
 import gui.saveAndRestore.SaveAndRestore;
@@ -30,7 +31,7 @@ import gui.saveAndRestore.SaveAndRestore;
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final LanguageAdapter adapter = new LanguageAdapter("rus");
-    private final SaveAndRestore saveAndRestore = new SaveAndRestore();
+    private final UserState saveAndRestore = new SaveAndRestore();
 
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
@@ -149,7 +150,7 @@ public class MainApplicationFrame extends JFrame {
                 null, options, options[1]);
         if (exit == 0) {
             int exitCode = 0;
-            if (!saveAndRestore.saveUserState(desktopPane))
+            if (!saveAndRestore.save(desktopPane))
                 exitCode = 1;
             System.exit(exitCode);
         }
@@ -157,7 +158,7 @@ public class MainApplicationFrame extends JFrame {
 
     private void restoreUserState() {
         try {
-            JInternalFrame[] frames = saveAndRestore.restoreUserState(adapter);
+            JInternalFrame[] frames = saveAndRestore.load(adapter);
             for (JInternalFrame frame : frames) {
                 addWindow(frame);
             }

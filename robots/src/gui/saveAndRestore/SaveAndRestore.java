@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class SaveAndRestore {
+public class SaveAndRestore implements UserState {
     private final Path userFile = Path.of(".").toAbsolutePath().getParent().resolve(System.getProperty("user.name") + "\\config.txt");
 
     public boolean userFileDontExist() {
@@ -34,7 +34,7 @@ public class SaveAndRestore {
         }
     }
 
-    public boolean saveUserState(JDesktopPane desktopPane) {
+    public boolean save(JDesktopPane desktopPane) {
         //сохраняет данные об окошках пользователя в файл "config.txt"
         if (userFileDontExist())
             if (!createUserDirectory())
@@ -53,7 +53,7 @@ public class SaveAndRestore {
         }
     }
 
-    public JInternalFrame[] restoreUserState(LanguageAdapter adapter) throws Exception {
+    public JInternalFrame[] load(LanguageAdapter adapter) throws Exception {
         //из файла "config.txt" считывает данные про окна и создаёт список окошек по заданным данным
         List<String> frames = Files.readAllLines(userFile);
         JInternalFrame[] userFrames = new JInternalFrame[frames.size()];
