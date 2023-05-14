@@ -18,10 +18,9 @@ import javax.swing.JOptionPane;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import gui.saveAndRestore.UserState;
+import gui.saveAndRestore.WindowWithFilePath;
 import language.LanguageAdapter;
 import log.Logger;
-import gui.saveAndRestore.SaveAndRestore;
 
 /**
  * Что требуется сделать:
@@ -31,7 +30,8 @@ import gui.saveAndRestore.SaveAndRestore;
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final LanguageAdapter adapter = new LanguageAdapter("rus");
-    private final UserState saveAndRestore = new SaveAndRestore();
+    private LogWindow logWindow;
+    private GameWindow gameWindow;
 
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
@@ -45,7 +45,7 @@ public class MainApplicationFrame extends JFrame {
         setContentPane(desktopPane);
 
 //одна строчка
-        restoreUserState();
+        createStandardState();
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -57,10 +57,11 @@ public class MainApplicationFrame extends JFrame {
     }
 
     protected LogWindow createLogWindow() {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), adapter);
-        logWindow.setLocation(10, 10);
-        logWindow.setSize(300, 800);
+        logWindow = new LogWindow(Logger.getDefaultLogSource(), adapter);
+        //logWindow.setLocation(10, 10);
+        //logWindow.setSize(300, 800);
         setMinimumSize(logWindow.getSize());
+        logWindow.load();
         logWindow.pack();
         Logger.debug(adapter.translate("protocol_is_working"));
         return logWindow;
@@ -69,11 +70,6 @@ public class MainApplicationFrame extends JFrame {
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
-    }
-
-    protected void addWindow(JInternalFrame frame, int width, int height) {
-        frame.setSize(width, height);
-        addWindow(frame);
     }
 
 //    protected JMenuBar createMenuBar() {
@@ -149,27 +145,17 @@ public class MainApplicationFrame extends JFrame {
                 JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, options, options[1]);
         if (exit == 0) {
-            int exitCode = 0;
-            if (!saveAndRestore.save(desktopPane))
-                exitCode = 1;
-            System.exit(exitCode);
-        }
-    }
-
-    private void restoreUserState() {
-        try {
-            JInternalFrame[] frames = saveAndRestore.load(adapter);
-            for (JInternalFrame frame : frames) {
-                addWindow(frame);
-            }
-        } catch (Exception ex) {
-            createStandardState();
+            logWindow.save();
+            gameWindow.save();
+            System.exit(exit);
         }
     }
 
     private void createStandardState() {
         addWindow(createLogWindow());
-        addWindow(new GameWindow(adapter), 400, 400);
+        gameWindow = new GameWindow(adapter);
+        gameWindow.load();
+        addWindow(gameWindow);
     }
 
     private JMenu addMenu(String menuName, String description, int mnemonic) {
