@@ -24,7 +24,7 @@ public class RobotState extends Observable {
     private volatile int m_targetPositionY = 100;
 
     public static final double maxVelocity = 0.1;
-    public static final double maxAngularVelocity = 0.001;
+    public static final double maxAngularVelocity = 0.0025;
 
     public RobotState()
     {
@@ -52,8 +52,8 @@ public class RobotState extends Observable {
 
     public void setTargetPosition(Point p)
     {
-        m_targetPositionX = p.x;
-        m_targetPositionY = p.y;
+        m_targetPositionX = p.x + p.x/4;
+        m_targetPositionY = p.y + p.y/4;
     }
 
     public double getM_robotPositionX() {
@@ -87,8 +87,8 @@ public class RobotState extends Observable {
 
     public void moveRobot(double velocity, double angularVelocity, double duration)
     {
-        //velocity = applyLimits(velocity, 0, maxVelocity);
-        //angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
+        velocity = applyLimits(velocity, 0, maxVelocity);
+        angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
         double newX = m_robotPositionX + velocity / angularVelocity *
                 (Math.sin(m_robotDirection  + angularVelocity * duration) -
                         Math.sin(m_robotDirection));
