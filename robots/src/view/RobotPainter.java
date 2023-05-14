@@ -15,17 +15,14 @@ public class RobotPainter extends JPanel {
     public RobotPainter(RobotState model){
         robotModel = model;
     }
-    private static int round(double value)
-    {
-        return (int)(value + 0.5);
-    }
 
     @Override
     public void paint(Graphics g)
     {
         super.paint(g);
         Graphics2D g2d = (Graphics2D)g;
-        drawRobot(g2d, round(robotModel.getM_robotPositionX()), round(robotModel.getM_robotPositionY()), robotModel.getM_robotDirection());
+        drawRobot(g2d, RobotCoordinates.round(robotModel.getM_robotPositionX()),
+                RobotCoordinates.round(robotModel.getM_robotPositionY()), robotModel.getM_robotDirection());
         drawTarget(g2d, robotModel.getM_targetPositionX(), robotModel.getM_targetPositionY());
     }
 
@@ -41,8 +38,8 @@ public class RobotPainter extends JPanel {
 
     private void drawRobot(Graphics2D g, int x, int y, double direction)
     {
-        int robotCenterX = round(robotModel.getM_robotPositionX());
-        int robotCenterY = round(robotModel.getM_robotPositionY());
+        int robotCenterX = RobotCoordinates.round(robotModel.getM_robotPositionX());
+        int robotCenterY = RobotCoordinates.round(robotModel.getM_robotPositionY());
         AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
         g.setTransform(t);
         g.setColor(Color.MAGENTA);

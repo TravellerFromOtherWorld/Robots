@@ -87,10 +87,12 @@ public class GameWindow extends JInternalFrame implements Observer {
 
         double angle = RobotState.asNormalizedRadians(angleToTarget - robotModel.getM_robotDirection());
 
-        if (angle < Math.PI / 2) {
-            angularVelocity = RobotState.maxAngularVelocity;
-        } else if (angle > Math.PI / 2) {
-            angularVelocity = -RobotState.maxAngularVelocity;
+        if (distance > (RobotState.maxVelocity/RobotState.maxAngularVelocity)){
+            if (angle < Math.PI / 2) {
+                angularVelocity = RobotState.maxAngularVelocity;
+            } else if (angle > Math.PI / 2) {
+                angularVelocity = -RobotState.maxAngularVelocity;
+            }
         }
         /*
         if (angleToTarget > robotModel.getM_robotDirection())

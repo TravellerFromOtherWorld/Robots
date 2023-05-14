@@ -50,7 +50,7 @@ public class RobotCoordinates extends JInternalFrame implements Observer {
         }
     }
 
-    private static int round(double value) {
+    public static int round(double value) {
         return (int) (value + 0.5);
     }
 }
