@@ -1,7 +1,8 @@
 package view;
 
 import language.LanguageAdapter;
-import model.robotState.RobotState;
+import model.state.GameState;
+import model.state.Robot;
 
 import java.awt.EventQueue;
 import java.awt.BorderLayout;
@@ -15,15 +16,15 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
 public class GameWindow extends JInternalFrame implements Observer {
-    private final RobotState robotModel;
+    private final GameState robotModel;
 
-    public GameWindow(LanguageAdapter adapter, RobotState model) {
+    public GameWindow(LanguageAdapter adapter, GameState model) {
         super(adapter.translate("game_window"), true, true, true, true);
         robotModel = model;
         robotModel.addObserver(this);
-        RobotPainter robotPainter = new RobotPainter(robotModel);
+        GamePainter gamePainter = new GamePainter(robotModel);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(robotPainter, BorderLayout.CENTER);
+        panel.add(gamePainter, BorderLayout.CENTER);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -43,9 +44,9 @@ public class GameWindow extends JInternalFrame implements Observer {
     @Override
     public void update(Observable o, Object key) {
         if (areEqual(robotModel, o)) {
-            if (areEqual(RobotState.KEY_REDRAW, key))
+            if (areEqual(GameState.KEY_REDRAW, key))
                 onRedrawEvent();
-            else if (areEqual(RobotState.KEY_MODEL_UPDATE, key))
+            else if (areEqual(GameState.KEY_MODEL_UPDATE, key))
                 onModelUpdateEvent();
         }
     }
@@ -64,35 +65,26 @@ public class GameWindow extends JInternalFrame implements Observer {
         double diffX = toX - fromX;
         double diffY = toY - fromY;
 
-        return RobotState.asNormalizedRadians(Math.atan2(diffY, diffX));
+        return GameState.asNormalizedRadians(Math.atan2(diffY, diffX));
     }
 
     protected void onModelUpdateEvent() {
-        double distance = distance(robotModel.getM_targetPositionX(), robotModel.getM_targetPositionY(),
-                robotModel.getM_robotPositionX(), robotModel.getM_robotPositionY());
+        double distance = distance(robotModel.targetX(), robotModel.targetY(),
+                robotModel.robotX(), robotModel.robotY());
         if (distance < 0.5) {
             return;
         }
-        double velocity = RobotState.maxVelocity;
-        double angleToTarget = angleTo(robotModel.getM_robotPositionX(), robotModel.getM_robotPositionY(),
-                robotModel.getM_targetPositionX(), robotModel.getM_targetPositionY());
+        double velocity = Robot.maxVelocity;
+        double angleToTarget = angleTo(robotModel.robotX(), robotModel.robotY(),
+                robotModel.targetX(), robotModel.targetY());
         double angularVelocity = 0;
 
-        double angle = RobotState.asNormalizedRadians(angleToTarget - robotModel.getM_robotDirection());
+        double angle = GameState.asNormalizedRadians(angleToTarget - robotModel.robotDirection());
         if (angle < Math.PI / 2) {
-            angularVelocity = RobotState.maxAngularVelocity;
+            angularVelocity = Robot.maxAngularVelocity;
         } else if (angle > Math.PI / 2) {
-            angularVelocity = -RobotState.maxAngularVelocity;
+            angularVelocity = -Robot.maxAngularVelocity;
         }
-        /*
-        if (angleToTarget > robotModel.getM_robotDirection())
-        {
-            angularVelocity = RobotState.maxAngularVelocity;
-        }
-        if (angleToTarget < robotModel.getM_robotDirection())
-        {
-            angularVelocity = -RobotState.maxAngularVelocity;
-        }*/
 
         robotModel.moveRobot(velocity, angularVelocity, 10);
     }

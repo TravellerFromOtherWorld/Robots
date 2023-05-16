@@ -1,12 +1,12 @@
 package view.saveAndRestore;
 
 
-import model.robotState.RobotState;
+import model.state.GameState;
 import view.GameWindow;
 import view.LogWindow;
 import language.LanguageAdapter;
 import model.log.Logger;
-import view.RobotCoordinates;
+import view.CoordinatesWindow;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -55,7 +55,7 @@ public class SaveAndRestore {
         }
     }
 
-    public JInternalFrame[] restoreUserState(LanguageAdapter adapter, RobotState model) throws Exception {
+    public JInternalFrame[] restoreUserState(LanguageAdapter adapter, GameState model) throws Exception {
         //из файла "config.txt" считывает данные про окна и создаёт список окошек по заданным данным
         List<String> frames = Files.readAllLines(userFile);
         JInternalFrame[] userFrames = new JInternalFrame[frames.size()];
@@ -68,7 +68,7 @@ public class SaveAndRestore {
                 userFrames[i] = new LogWindow(Logger.getDefaultLogSource(), adapter);
                 Logger.debug(adapter.translate("protocol_is_working"));
             } else if (frameInfo[0].equals("Окно координат")) {
-                userFrames[i] = new RobotCoordinates(model);
+                userFrames[i] = new CoordinatesWindow(model);
             }
             userFrames[i].setBounds(Integer.parseInt(frameInfo[3]), Integer.parseInt(frameInfo[4]),
                     Integer.parseInt(frameInfo[2]), Integer.parseInt(frameInfo[1]));

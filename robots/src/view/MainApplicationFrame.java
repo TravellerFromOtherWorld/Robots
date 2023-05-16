@@ -21,7 +21,7 @@ import java.awt.event.WindowEvent;
 import language.LanguageAdapter;
 import model.log.Logger;
 import view.saveAndRestore.SaveAndRestore;
-import model.robotState.RobotState;
+import model.state.GameState;
 
 /**
  * Что требуется сделать:
@@ -32,9 +32,9 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final LanguageAdapter adapter = new LanguageAdapter("rus");
     private final SaveAndRestore saveAndRestore = new SaveAndRestore();
-    private final RobotState robotModel;
+    private final GameState robotModel;
 
-    public MainApplicationFrame(RobotState model) {
+    public MainApplicationFrame(GameState model) {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
         robotModel = model;
@@ -172,7 +172,7 @@ public class MainApplicationFrame extends JFrame {
     private void createStandardState() {
         addWindow(createLogWindow());
         addWindow(new GameWindow(adapter, robotModel), 400, 400);
-        addWindow(new RobotCoordinates(robotModel));
+        addWindow(new CoordinatesWindow(robotModel));
     }
 
     private JMenu addMenu(String menuName, String description, int mnemonic) {

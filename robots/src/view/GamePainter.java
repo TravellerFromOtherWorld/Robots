@@ -1,6 +1,6 @@
 package view;
 
-import model.robotState.RobotState;
+import model.state.GameState;
 
 import javax.swing.JPanel;
 import java.awt.Color;
@@ -9,10 +9,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 
-public class RobotPainter extends JPanel {
-    private final RobotState robotModel;
+public class GamePainter extends JPanel {
+    private final GameState robotModel;
 
-    public RobotPainter(RobotState model){
+    public GamePainter(GameState model){
         robotModel = model;
     }
 
@@ -21,9 +21,9 @@ public class RobotPainter extends JPanel {
     {
         super.paint(g);
         Graphics2D g2d = (Graphics2D)g;
-        drawRobot(g2d, RobotCoordinates.round(robotModel.getM_robotPositionX()),
-                RobotCoordinates.round(robotModel.getM_robotPositionY()), robotModel.getM_robotDirection());
-        drawTarget(g2d, robotModel.getM_targetPositionX(), robotModel.getM_targetPositionY());
+        drawRobot(g2d, CoordinatesWindow.round(robotModel.robotX()),
+                CoordinatesWindow.round(robotModel.robotY()), robotModel.robotDirection());
+        drawTarget(g2d, robotModel.targetX(), robotModel.targetY());
     }
 
     private static void fillOval(Graphics g, int centerX, int centerY, int diam1, int diam2)
@@ -38,8 +38,8 @@ public class RobotPainter extends JPanel {
 
     private void drawRobot(Graphics2D g, int x, int y, double direction)
     {
-        int robotCenterX = RobotCoordinates.round(robotModel.getM_robotPositionX());
-        int robotCenterY = RobotCoordinates.round(robotModel.getM_robotPositionY());
+        int robotCenterX = CoordinatesWindow.round(robotModel.robotX());
+        int robotCenterY = CoordinatesWindow.round(robotModel.robotY());
         AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
         g.setTransform(t);
         g.setColor(Color.MAGENTA);

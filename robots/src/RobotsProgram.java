@@ -1,4 +1,4 @@
-import model.robotState.RobotState;
+import model.state.GameState;
 import view.MainApplicationFrame;
 
 import java.awt.Frame;
@@ -16,7 +16,7 @@ public class RobotsProgram {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        RobotState model = new RobotState();
+        GameState model = new GameState();
         SwingUtilities.invokeLater(() -> {
             MainApplicationFrame frame = new MainApplicationFrame(model);
             frame.pack();

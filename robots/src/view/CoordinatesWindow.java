@@ -1,6 +1,6 @@
 package view;
 
-import model.robotState.RobotState;
+import model.state.GameState;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
@@ -9,16 +9,16 @@ import java.awt.BorderLayout;
 import java.util.Observable;
 import java.util.Observer;
 
-public class RobotCoordinates extends JInternalFrame implements Observer {
+public class CoordinatesWindow extends JInternalFrame implements Observer {
     private TextArea coordinates;
     private int cordX = 0;
     private int cordY = 0;
-    private final RobotState robotModel;
+    private final GameState gameModel;
 
-    public RobotCoordinates(RobotState model) {
+    public CoordinatesWindow(GameState model) {
         super("Окно координат", true, true, true, true);
-        robotModel = model;
-        robotModel.addObserver(this);
+        gameModel = model;
+        gameModel.addObserver(this);
         coordinates = new TextArea("");
         coordinates.setSize(200, 500);
 
@@ -36,16 +36,16 @@ public class RobotCoordinates extends JInternalFrame implements Observer {
 
     @Override
     public void update(Observable o, Object key) {
-        if (areEqual(robotModel, o)) {
-            if (areEqual(RobotState.KEY_MODEL_UPDATE, key))
+        if (areEqual(gameModel, o)) {
+            if (areEqual(GameState.KEY_MODEL_UPDATE, key))
                 onModelUpdateEvent();
         }
     }
 
     private void onModelUpdateEvent() {
-        if (cordX != round(robotModel.getM_robotPositionX()) && cordY != round(robotModel.getM_robotPositionY())) {
-            cordX = round(robotModel.getM_robotPositionX());
-            cordY = round(robotModel.getM_robotPositionY());
+        if (cordX != round(gameModel.robotX()) && cordY != round(gameModel.robotY())) {
+            cordX = round(gameModel.robotX());
+            cordY = round(gameModel.robotY());
             coordinates.append("Координаты по x: " + cordX + ", координаты по y: " + cordY + "\n");
         }
     }
