@@ -1,4 +1,4 @@
-package log;
+package model.log;
 
 import java.util.ArrayList;
 import java.util.Collections;
